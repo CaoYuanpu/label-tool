@@ -3,7 +3,7 @@ A tool for labeling anomaly of multivariate time series.
 
 ## Getting Started
 
-#### clone the repo
+#### Clone the repo
 
 ```shell
 git clone https://github.com/CaoYuanpu/label-tool.git

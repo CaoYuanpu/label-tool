@@ -91,14 +91,16 @@ class LabelWidget(QWidget):
         self.ui.timeInterval_button.setText(self.config['time_interval'])
         if self.config['date']:
             start = time.localtime(data['timestamp'][0])
-            start = time.strftime("%Y-%m-%d %H:%M:%S", start)
+            start = time.strftime("%Y/%m/%d\n%H:%M:%S", start)
             end = time.localtime(data['timestamp'][len(data['timestamp'])-1])
-            end = time.strftime("%Y-%m-%d %H:%M:%S", end)
+            end = time.strftime("%Y/%m/%d\n%H:%M:%S", end)
         else:
             start = '0'
             end = str(data['value'].shape[0] - 1)
         info = 'Start Index: ' + start + '  —  End Index: ' + end
         self.ui.info_label.setText('| '+info)
+        self.ui.startIndex_button.setText(start)
+        self.ui.endIndex_button.setText(end)
         self.setWindowIcon(QIcon('images/logo.png'))
         #self.canvas.mpl_connect('key_press_event', self._zoom_score)
 
@@ -116,11 +118,11 @@ class LabelWidget(QWidget):
         row_num = value.shape[1]  
         if config['tag']:
             row_num += 3
-            # TODO: 更换数据中的score
             tag = data['tag']
         grid = figure.add_gridspec(row_num, 1, left=0.08, bottom=0.04, right=0.99, top=1.0, wspace=0.2, hspace=0.2)
         if config['tag']:
             kpi_plt = figure.add_subplot(grid[:row_num-3, 0])
+            kpi_plt.xaxis.set_visible(False)
             tag_plt = figure.add_subplot(grid[row_num-3:row_num, 0], sharex=kpi_plt.axes)
             tag_plt.set_ylabel('tag', size=8)
             tag_plt.tick_params(axis="y", labelsize=5)
@@ -143,7 +145,6 @@ class LabelWidget(QWidget):
                 return dt
             formatter = ticker.FuncFormatter(ts2dt)
             kpi_plt.xaxis.set_major_formatter(formatter)
-            kpi_plt.xaxis.set_visible(False)
         #if config['tag']:
         #    tag_plt.set_ylabel('tag', size=8)
         #    tag_plt.tick_params(axis='y', labelsize=5)
@@ -151,7 +152,7 @@ class LabelWidget(QWidget):
         #    self.tag_plt = tag_plt
         kpi_plt.set_title('kpi', fontsize=1)
         self.kpi_plt = kpi_plt
-        #plt.subplots_adjust(top=1,bottom=0.5,left=0.5,right=1,hspace=0,wspace=0)
+        plt.subplots_adjust(top=1,bottom=0.5,left=0.5,right=1)
         #plt.margins(0, 0)
 
 
@@ -180,6 +181,9 @@ class LabelWidget(QWidget):
         for index in range(len(kpi_list)):
             value[:, index] += index
         lines = self.kpi_plt.plot(xs, value, linewidth=1)
+        space_x = int(len(xs) * 0.01 * (xs[1] - xs[0]))
+        self.kpi_plt.set_xlim(xs[0]-space_x, xs[-1]+space_x)
+        self.kpi_plt.set_ylim(-1, row_num+1)
         self.lines.extend(lines)
         if config['tag']:
             lines = self.tag_plt.plot(xs, tag, color='blue')
