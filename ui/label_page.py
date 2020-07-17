@@ -17,6 +17,8 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import (
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
+from copy import deepcopy
+
 
 class CustomedToolbar(NavigationToolbar):
     # only display the buttons we need
@@ -38,6 +40,8 @@ class LabelWidget(QWidget):
 
     def __init__(self, config, dir_, machine_list):
         QWidget.__init__(self)
+
+        # init and load ui
         self.dir_ = dir_
         self.config = config
         self.machine_list = machine_list
@@ -51,6 +55,7 @@ class LabelWidget(QWidget):
         self.anomaly_length = 0
         self.lines = []
         self.data_button = None
+        self.merge = False
         ui_file = QFile('label_page.ui')
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
@@ -60,6 +65,8 @@ class LabelWidget(QWidget):
         self.ui.machine_label.setPixmap(QPixmap('images/machine1.png'))
         ui_file.close()
         self.setWindowTitle('Label Tool')
+
+        # add button to choose machine
         machine_layout = QVBoxLayout()
         machine_layout.setSpacing(10)
         button_list = [QPushButton(machine) for machine in machine_list]
@@ -76,19 +83,25 @@ class LabelWidget(QWidget):
             machine_layout.addWidget(button)
         machine_layout.addStretch()
         self.ui.scrollAreaWidgetContents.setLayout(machine_layout)
-        self.ui.finish_button.clicked.connect(self.finish)
 
+        # load the data of first machine
         machine = self.machine_list[self.ind]
         data = self._read_data(machine)
         self.data = data
-        self.init_figure(data)
+        self.merge_kpi, self.merge_str = self.kpi_2be_merged(self.data)
+
+        # init figure and draw kpi time series of first machine
+        self.init_figure(data, self.merge)
         self.canvas = self.ui.plot_widget.canvas
         CustomedToolbar(self.canvas, self.ui.toolBar_widget)
-        self.draw(data, machine)
+        self.draw(data, self.merge)
         self.canvas.mpl_connect('scroll_event', self._zoom)
         self.canvas.mpl_connect('button_press_event', self._zoom)
         self.canvas.mpl_connect('button_press_event', self._label)
+
+        # set function button and add some information bars
         self.ui.timeInterval_button.setText(self.config['time_interval'])
+        self.ui.mergeKPIs_button.setText(self.merge_str+'To\n'+str(self.merge_kpi[-1]))
         if self.config['date']:
             start = time.localtime(data['timestamp'][0])
             start = time.strftime("%Y/%m/%d\n%H:%M:%S", start)
@@ -101,25 +114,56 @@ class LabelWidget(QWidget):
         self.ui.info_label.setText('| '+info)
         self.ui.startIndex_button.setText(start)
         self.ui.endIndex_button.setText(end)
+        self.ui.finish_button.clicked.connect(self.finish)
+        self.ui.merge_button.clicked.connect(self.merge_seperate)
         self.setWindowIcon(QIcon('images/logo.png'))
-        #self.canvas.mpl_connect('key_press_event', self._zoom_score)
 
-    def init_figure(self, data):
+    def kpi_2be_merged(self, data):
+        '''
+        Get the indexs of kpis need to be merged
+        '''
+        value = data['value']
+        len_ = value.shape[0]
+        threshold = int(len_*0.99)
+        merge_kpi = []
+        if self.config['noshow_kpi']:
+            for i in range(value.shape[1]):
+                if i not in self.config['noshow_kpi'] and np.sum(value[:, i] == 0) >= threshold:
+                    merge_kpi.append(i)
+        else:
+            for i in range(value.shape[1]):
+                if np.sum(value[:, i] == 0) >= threshold:
+                    merge_kpi.append(i)
+        merge_str = ""
+        for i, kpi in enumerate(merge_kpi):
+            if (i+1) % 6 == 0:
+                merge_str = merge_str + str(kpi) + '\n'
+            else:
+                merge_str = merge_str + str(kpi) + ' '
+        if len(merge_kpi) % 6 != 0: 
+            merge_str += '\n'
+        return merge_kpi, merge_str
+
+
+    def init_figure(self, data, merge=False):
         figure = self.ui.plot_widget.canvas.figure
         config = self.config
+
+        # get the kpi list storing the indexes of kpis which need ploting
         kpi_num = data['value'].shape[1]
-        if config['noshow_kpi'] is None:
+        if not config['noshow_kpi']:
             kpi_list = list(range(kpi_num))
             self.kpi_num = kpi_num
         else:
             kpi_list = [i for i in range(kpi_num) if i not in config['noshow_kpi']]
             self.kpi_num = len(kpi_list)
-        value = data['value'][:, kpi_list]
-        row_num = value.shape[1]  
+
+        # init subplot
+        row_num = kpi_num
         if config['tag']:
             row_num += 3
             tag = data['tag']
-        grid = figure.add_gridspec(row_num, 1, left=0.08, bottom=0.04, right=0.99, top=1.0, wspace=0.2, hspace=0.2)
+        grid = figure.add_gridspec(row_num, 1, left=0.07, bottom=0.04, right=0.99, top=1.0, wspace=0.2, hspace=0.2)
         if config['tag']:
             kpi_plt = figure.add_subplot(grid[:row_num-3, 0])
             kpi_plt.xaxis.set_visible(False)
@@ -131,34 +175,37 @@ class LabelWidget(QWidget):
             self.tag_plt = tag_plt
         else:
             kpi_plt = figure.add_subplot(grid[:row_num, 0])
-        # TODO
-        #figure.axis('off')
-        #figure.text(0, 0, f'dir {self.dir_}', fontdict={'size': 10})
+
+        # configure figure
         kpi_plt.set_title('kpi', fontsize=1)
         kpi_plt.tick_params(axis="x", labelsize=6)
+        kpi_plt.tick_params(axis="y", labelsize=7)
         kpi_plt.set_yticks(range(0, len(kpi_list)))
         kpi_plt.grid(linestyle="-.", color='black', linewidth=0.05)
+        xs = list(range(data['value'].shape[0]))
         if config['date']:
             def ts2dt(x, pos):
                 time_local = time.localtime(x)
                 dt = time.strftime("%Y/%m/%d %H:%M:%S", time_local)
                 return dt
-            formatter = ticker.FuncFormatter(ts2dt)
-            kpi_plt.xaxis.set_major_formatter(formatter)
-        #if config['tag']:
-        #    tag_plt.set_ylabel('tag', size=8)
-        #    tag_plt.tick_params(axis='y', labelsize=5)
-        #    tag_plt.set_title('tag', fontsize=1)
-        #    self.tag_plt = tag_plt
-        kpi_plt.set_title('kpi', fontsize=1)
+            formatter_x = ticker.FuncFormatter(ts2dt)
+            kpi_plt.xaxis.set_major_formatter(formatter_x)
+            xs = [int(date) for date in self.data['timestamp']]
+        space_x = int(len(xs) * 0.01 * (xs[1] - xs[0]))
+        kpi_plt.set_xlim(xs[0]-space_x, xs[-1]+space_x)
         self.kpi_plt = kpi_plt
-        plt.subplots_adjust(top=1,bottom=0.5,left=0.5,right=1)
-        #plt.margins(0, 0)
 
 
-    def draw(self, data, machine):
-        for line in self.lines:
-            line.remove()
+    def draw(self, data, merge=False):
+        
+        # clear lines in the figure
+        if not merge:
+            for line in self.lines:
+                line.remove()
+        else:
+            for line in self.lines:
+                if type(line) == mpl.lines.Line2D:
+                    line.remove()
         self.lines = []
         config = self.config
         kpi_num = data['value'].shape[1]
@@ -166,13 +213,15 @@ class LabelWidget(QWidget):
             kpi_list = list(range(kpi_num))
         else:
             kpi_list = [i for i in range(kpi_num) if i not in config['noshow_kpi']]
+        if merge:
+            kpi_list = [i for i in kpi_list if i not in self.merge_kpi]
+
+        # plot kpis
+        # TODO: modify
+        # value = deepcopy(data['value'][:, kpi_list])
         value = data['value'][:, kpi_list]
-        row_num = value.shape[1]  
         if config['tag']:
-            row_num += 3
-            # TODO: 更换数据中的score
             tag = data['tag']
-        self.kpi_plt.set_ylabel(machine, size=10)
         if config['date']:
             dates = data['timestamp']
             xs = [int(date) for date in dates]
@@ -181,35 +230,50 @@ class LabelWidget(QWidget):
         for index in range(len(kpi_list)):
             value[:, index] += index
         lines = self.kpi_plt.plot(xs, value, linewidth=1)
-        space_x = int(len(xs) * 0.01 * (xs[1] - xs[0]))
-        self.kpi_plt.set_xlim(xs[0]-space_x, xs[-1]+space_x)
-        self.kpi_plt.set_ylim(-1, row_num+1)
         self.lines.extend(lines)
+
+        # merge kpis
+        if merge:
+            kpi_list.append(self.merge_kpi[-1])
+            for kpi in self.merge_kpi:
+                # TODO: modify
+                merge_value = deepcopy(data['value'][:, kpi]).T
+                #merge_value = data['value'][:, kpi].T
+                merge_value += (len(kpi_list) - 1)
+                self.lines.extend(self.kpi_plt.plot(xs, merge_value, linewidth=1))
+
+        # plot tag
         if config['tag']:
             lines = self.tag_plt.plot(xs, tag, color='blue')
             self.lines.extend(lines)
+
+        # configure figure
+        self.kpi_plt.set_ylim(-1, len(kpi_list))
+        self.kpi_plt.set_yticks(range(0, len(kpi_list)))
+        def seq2index(y, pos):
+            if y < len(kpi_list):
+                return kpi_list[math.floor(y)]
+            else:
+                return y
+        formatter_y = ticker.FuncFormatter(seq2index)
+        self.kpi_plt.yaxis.set_major_formatter(formatter_y)
         self.canvas.draw_idle()
 
     def _read_data(self, machine):
         config = self.config
         path = config['data_root'] + '/'+self.dir_+'/'+machine+'.'+config['file']
-        #path = f"{config['data_root']}/{self.dir_}/{ip}.{config['file']}"
         if not os.path.exists(path):
             raise SystemError('File in \"'+path+'\" does not exist!')
         dict_ = {'timestamp': None, 'value': None, 'tag':None}
         if config['file'] == 'csv':
             df = pd.read_csv(path)
             dict_ = {'timestamp': df['timestamp']}
-            #print('timestamp', dict_['timestamp'].shape)
             num = len(df.columns)
-            #print('num', num)
             if 'tag' in df.columns:
                 dict_['tag'] = df['tag']
                 dict_['value'] = df.values[:, 1:num-1]
             else:
                 dict_['value'] = df.values[:, 1:num]
-            #print('tag', dict_['tag'].shape)
-            #print('value', dict_['value'].shape)
         elif config['file'] == 'pkl':
             with open(path, 'rb') as f:
                 dict_ = pickle.load(f)
@@ -258,7 +322,7 @@ class LabelWidget(QWidget):
                         self.anomaly_length -= 1
                         percent = ('%.2f%%' % (self.anomaly_length/self.data['value'].shape[0]*100))
                         self.ui.percent_button.setText(str(percent))
-                        self.draw(self.data, machine)
+                        self.draw(self.data, self.merge)
                 elif not event.dblclick:
                     self.x_list.append(x_data)
                     self.anomaly_length += 1
@@ -276,7 +340,7 @@ class LabelWidget(QWidget):
                         self.ui.segment_button.setText(str(self.segments))
                         self.ui.percent_button.setText(str(percent))
                         self.lr *= -1
-                        self.draw(self.data, machine)
+                        self.draw(self.data, self.merge)
                 elif not event.dblclick:
                     self.lr_list.append(x_data)
                     self.lr *= -1
@@ -317,10 +381,31 @@ class LabelWidget(QWidget):
         self.segments = 0
         self.anomaly_length = 0       
         self.data = self._read_data(machine)
-        self.draw(self.data, machine)
+        self.merge_kpi, self.merge_str = self.kpi_2be_merged(self.data)
+        self.ui.merge_label.setText('Merge KPIs')
+        self.ui.mergeKPIs_button.setText(self.merge_str+'To\n'+str(self.merge_kpi[-1]))
+        self.ui.merge_button.setText('Merge')
+        self.merge = False
+        self.draw(self.data, self.merge)
         self.ui.segment_button.setText('0')
-        self.ui.percent_button.setText('0.0%') 
+        self.ui.percent_button.setText('0.0%')
 
+    @Slot()
+    def merge_seperate(self):
+        button = self.sender()
+        if button.text() == 'Merge':
+            button.setText('Seperate')
+            self.merge = True
+            self.ui.merge_label.setText('Seperate KPIs')
+            self.ui.mergeKPIs_button.setText(str(self.merge_kpi[-1])+'\nTo\n'+self.merge_str)
+            self.draw(self.data, self.merge)
+
+        else:
+            button.setText('Merge')
+            self.merge = False
+            self.ui.merge_label.setText('Merge KPIs')
+            self.ui.mergeKPIs_button.setText(self.merge_str+'To\n'+str(self.merge_kpi[-1]))
+            self.draw(self.data, self.merge)
 
     @Slot()
     def finish(self):
@@ -336,7 +421,12 @@ class LabelWidget(QWidget):
         self.ind = (self.ind+1) % len(self.machine_list)
         machine = self.machine_list[self.ind]
         self.data = self._read_data(machine)
-        self.draw(self.data, machine)
+        self.merge_kpi, self.merge_str = self.kpi_2be_merged(self.data)
+        self.ui.merge_label.setText('Merge KPIs')
+        self.ui.mergeKPIs_button.setText(self.merge_str+'To\n'+str(self.merge_kpi[-1]))
+        self.ui.merge_button.setText('Merge')
+        self.merge = False
+        self.draw(self.data, self.merge)
         self.ui.segment_button.setText('0')
         self.ui.percent_button.setText('0.0%')
 

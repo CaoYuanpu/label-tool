@@ -55,6 +55,15 @@ background-color: rgb(255, 255, 255);</string>
      <height>900</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
@@ -66,6 +75,11 @@ background-color: rgb(255, 255, 255);</string>
       <width>1115</width>
       <height>905</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -79,7 +93,7 @@ background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>11</pointsize>
       <weight>9</weight>
       <italic>false</italic>
@@ -87,8 +101,7 @@ background-color: rgb(255, 255, 255);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 11pt &quot;Times New Roman&quot;;
-color: rgb(140, 140, 140);</string>
+     <string notr="true">color: rgb(140, 140, 140);</string>
     </property>
     <property name="text">
      <string>Time Interval</string>
@@ -103,13 +116,13 @@ color: rgb(140, 140, 140);</string>
       <x>1060</x>
       <y>40</y>
       <width>130</width>
-      <height>50</height>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
+      <family>Calibri</family>
+      <pointsize>12</pointsize>
       <weight>9</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -117,7 +130,6 @@ color: rgb(140, 140, 140);</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(0, 0, 0);</string>
     </property>
@@ -129,23 +141,22 @@ color: rgb(0, 0, 0);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>430</y>
+      <y>330</y>
       <width>135</width>
       <height>30</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>11</pointsize>
-      <weight>9</weight>
+      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 11pt &quot;Times New Roman&quot;;
-color: rgb(140, 140, 140);</string>
+     <string notr="true">color: rgb(140, 140, 140);</string>
     </property>
     <property name="text">
      <string>Anomaly Segment</string>
@@ -158,15 +169,15 @@ color: rgb(140, 140, 140);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>460</y>
+      <y>360</y>
       <width>130</width>
-      <height>50</height>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
+      <family>Calibri</family>
+      <pointsize>12</pointsize>
       <weight>9</weight>
       <italic>false</italic>
       <bold>false</bold>
@@ -174,7 +185,6 @@ color: rgb(140, 140, 140);</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(0, 0, 0);</string>
     </property>
@@ -186,23 +196,22 @@ color: rgb(0, 0, 0);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>570</y>
+      <y>420</y>
       <width>135</width>
       <height>30</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>11</pointsize>
-      <weight>9</weight>
+      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 11pt &quot;Times New Roman&quot;;
-color: rgb(140, 140, 140);</string>
+     <string notr="true">color: rgb(140, 140, 140);</string>
     </property>
     <property name="text">
      <string>Anomaly Percent</string>
@@ -218,23 +227,22 @@ color: rgb(140, 140, 140);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>600</y>
+      <y>450</y>
       <width>130</width>
-      <height>50</height>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
-      <weight>9</weight>
+      <family>Calibri</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(0, 0, 0);</string>
     </property>
@@ -253,7 +261,7 @@ color: rgb(0, 0, 0);</string>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>16</pointsize>
       <weight>9</weight>
       <italic>false</italic>
@@ -262,7 +270,6 @@ color: rgb(0, 0, 0);</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(24, 144, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(255, 255, 255);</string>
     </property>
@@ -274,7 +281,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>1104</x>
-      <y>710</y>
+      <y>510</y>
       <width>50</width>
       <height>60</height>
      </rect>
@@ -284,23 +291,22 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>320</y>
+      <y>230</y>
       <width>130</width>
       <height>50</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
-      <weight>9</weight>
+      <family>Calibri</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(0, 0, 0);</string>
     </property>
@@ -313,14 +319,14 @@ color: rgb(0, 0, 0);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>285</y>
+      <y>200</y>
       <width>135</width>
       <height>30</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>11</pointsize>
       <weight>9</weight>
       <italic>false</italic>
@@ -328,7 +334,7 @@ color: rgb(0, 0, 0);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 11pt &quot;Times New Roman&quot;;
+     <string notr="true">
 color: rgb(140, 140, 140);</string>
     </property>
     <property name="text">
@@ -342,23 +348,22 @@ color: rgb(140, 140, 140);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>175</y>
+      <y>130</y>
       <width>130</width>
-      <height>50</height>
+      <height>40</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>16</pointsize>
-      <weight>9</weight>
+      <family>Calibri</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);
-font: 75 16pt &quot;Times New Roman&quot;;
 border-radius:13px;
 color: rgb(0, 0, 0);</string>
     </property>
@@ -371,14 +376,14 @@ color: rgb(0, 0, 0);</string>
     <property name="geometry">
      <rect>
       <x>1060</x>
-      <y>140</y>
+      <y>100</y>
       <width>135</width>
       <height>30</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
+      <family>Calibri</family>
       <pointsize>11</pointsize>
       <weight>9</weight>
       <italic>false</italic>
@@ -386,11 +391,103 @@ color: rgb(0, 0, 0);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 75 11pt &quot;Times New Roman&quot;;
-color: rgb(140, 140, 140);</string>
+     <string notr="true">color: rgb(140, 140, 140);</string>
     </property>
     <property name="text">
      <string>Start Index</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="merge_button">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>745</y>
+      <width>135</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(24, 144, 255);
+border-radius:13px;
+color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Merge</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="mergeKPIs_button">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>627</y>
+      <width>131</width>
+      <height>115</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);
+border-radius:13px;
+color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>42 43 44 46 47
+To
+47</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="merge_label">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>590</y>
+      <width>135</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(140, 140, 140);</string>
+    </property>
+    <property name="text">
+     <string>Merge KPIs</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
